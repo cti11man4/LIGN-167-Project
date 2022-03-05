@@ -1,0 +1,7 @@
+# select the first 15,000 entries for each of our philosophers
+
+author_names = ['Heidegger', 'Plato', 'Foucault', 'Hegel', 'Aristotle']
+
+author_names = list(set(df['author']))
+df_list = [df[df['author'] == author][:15000].reset_index(drop=True) for author in author_names]
+df = pd.concat(df_list)
