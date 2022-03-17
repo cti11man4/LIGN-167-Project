@@ -1,0 +1,107 @@
+# remove entries still longer than 300 words
+
+entry_len = 300
+
+drop_list = []
+for i in range(df.shape[0]):
+    if i in df and len(df.at[i,'tokenized_txt']) >= entry_len:
+        drop_list.append(i)
+        
+df = df.drop(drop_list).reset_index(drop = True)
+
+
+
+
+
+
+
+
+# remove entries still longer than 100 words
+
+entry_len = 100
+
+drop_list = []
+for i in range(df.shape[0]):
+    if len(df.at[i,'tokenized_txt']) >= entry_len:
+        drop_list.append(i)
+        
+df = df.drop(drop_list).reset_index(drop = True)
+
+
+
+
+
+
+count = 0
+for i in df['tokenized_txt']:
+    if len(i) >100:
+        count += 1
+        
+print(count)
+
+
+
+
+
+
+text_embed_dim = 100                                      # changes the embedding dimension used
+glove_file = 'glove.6B.{}d.txt'.format(text_embed_dim)    # defines the GloVe file path -- change if using a new encoding dataset
+
+embed_dict = {}
+with open(glove_file, encoding = "utf8") as f:
+    for line in f:
+        word, coefs = line.split(maxsplit=1)
+        
+        # removed dtype = np.float64 from the call. 
+        coefs = np.fromstring(coefs, dtype = np.float32, sep=" ")
+        embed_dict[word] = coefs
+        
+print("Found %s word vectors." % len(embed_dict))
+
+
+
+
+# select the first 2,000 entries for each of our philosophers
+num_entries = 2000
+
+author_names = list(set(df['author']))
+df_list = [df[df['author'] == author][:num_entries].reset_index(drop=True) for author in author_names]
+df = pd.concat(df_list).reset_index(drop = True)
+
+
+
+
+
+
+
+entry_len = 100
+
+# replaces strings in an input sentence with word vectors
+def embeddings(sent):
+    
+    # embedding includes an internal padding step
+    padding_vec = np.zeros(text_embed_dim)
+    out_list = [padding_vec] * entry_len
+    
+    # no padding step
+    #out_list = []
+    
+    for j in range (0, len(sent)):
+        if sent[j] in embed_dict:
+            out_list[j] = embed_dict[sent[j]]
+                     
+    return(torch.tensor(out_list))
+    
+    
+    
+    
+# this step applies embedding and padding to all tokens
+tokens_list = [embeddings(df['tokenized_txt'].values[i]) for i in range (5*num_entries)]
+
+
+# this is just list storage of lables for the same data 
+identity_list = [df['y_expected'].values[i] for i in range (5*num_entries)]
+
+
+
+
