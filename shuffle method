@@ -1,0 +1,10 @@
+# shuffle dataset
+
+# zip to a combined reference
+to_shuffle = list(zip(list_1, list_2))
+
+# shuffle combined reference
+rand.shuffle(to_shuffle)
+
+# unzip combined reference
+list_1, list_2 = zip(*to_shuffle)
