@@ -105,3 +105,40 @@ identity_list = [df['y_expected'].values[i] for i in range (5*num_entries)]
 
 
 
+# Now we make our special dataset where authors are equally represented (in number of sentences)
+dataset_len = len(df['tokenized_txt'])
+
+num_authors = 5
+
+test_len = int(num_entries/num_authors)
+valid_len = int(num_entries/num_authors)
+train_len = int((3*num_entries/num_authors))
+
+
+
+test_list = [[],[]]
+valid_list = [[],[]]
+train_list = [[],[]]
+
+
+
+# populate list of test sentences
+for i in range (0, num_authors):
+    for j in range (0, test_len):
+        test_list[0].append(tokens_list[i * num_entries + j])
+        test_list[1].append(identity_list[i * num_entries + j])
+        
+        
+        
+# populate list of validation sentences
+for i in range (0, num_authors):
+    for j in range (test_len, (valid_len + test_len)):
+        valid_list[0].append(tokens_list[i * num_entries + j])
+        valid_list[1].append(identity_list[i * num_entries + j])
+        
+        
+# populate list of training sentences
+for i in range (num_authors):
+    for j in range ((valid_len + test_len), (valid_len + test_len + train_len)):
+        train_list[0].append(tokens_list[i * num_entries + j])
+        train_list[1].append(identity_list[i * num_entries + j])
